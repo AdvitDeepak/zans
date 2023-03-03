@@ -1,4 +1,4 @@
-# ACM AI Projects Skeleton Code
+# ZANS - tbd acronym
 
 ## Setup
 

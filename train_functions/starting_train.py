@@ -3,6 +3,13 @@ import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
 
+global device 
+device = torch.device('cpu') 
+
+# Switch to Cuda (GPU), if available
+if torch.cuda.is_available():
+    device = torch.device('cuda:0')
+
 
 def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     """
@@ -31,25 +38,66 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     optimizer = optim.Adam(model.parameters())
     loss_fn = nn.CrossEntropyLoss()
 
+
+    model = model.to(device)
+
+
+    # Initialize summary writer (for logging)
+    summary_path = "" # <-- todo! add this in CONSTANTS.py for tensorboard gen 
+    tb_summary = None
+    if summary_path is not None:
+        tb_summary = torch.utils.tensorboard.SummaryWriter(summary_path)
+
+
     step = 0
     for epoch in range(epochs):
         print(f"Epoch {epoch + 1} of {epochs}")
 
         # Loop over each batch in the dataset
         for batch in tqdm(train_loader):
-            # TODO: Backpropagation and gradient descent
+
+            input_data, label_data = batch
+            input_data = input_data.to(device)
+            label_data = label_data.to(device)
+            
+            pred = model(input_data)
+
+            # Prediction, label data have same shape
+            loss = loss_fn(pred, label_data) 
+            pred = pred.argmax(axis=1)
+
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+
+            print(f"\n    Train Loss: {loss.item()}")
+
+
 
             # Periodically evaluate our model + log to Tensorboard
             if step % n_eval == 0:
-                # TODO:
-                # Compute training loss and accuracy.
-                # Log the results to Tensorboard.
 
-                # TODO:
+                # Compute training loss and accuracy.
+                train_accuracy = compute_accuracy(pred, label_data)
+                print(f"    Train Accu: {train_accuracy}")
+
+                # Log the results to Tensorboard
+                if tb_summary:
+                    tb_summary.add_scalar('Loss (Training)', loss, epoch)
+                    tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
+
                 # Compute validation loss and accuracy.
+                valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
+
                 # Log the results to Tensorboard.
-                # Don't forget to turn off gradient calculations!
-                evaluate(val_loader, model, loss_fn)
+                if tb_summary:
+                    tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
+                    tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
+
+                print(f"    Valid Loss: {valid_loss}")
+                print(f"    Valid Accu: {valid_accuracy}")
+
+                model.train()
 
             step += 1
 
@@ -75,8 +123,26 @@ def compute_accuracy(outputs, labels):
 
 def evaluate(val_loader, model, loss_fn):
     """
-    Computes the loss and accuracy of a model on the validation dataset.
-
-    TODO!
+    Computes the loss and accuracy of a model on the validation dataset!
     """
-    pass
+    model.eval()
+    model = model.to(device)
+    model.resnet = (model.resnet).to(device)
+
+    loss, correct, count = 0, 0, 0
+    with torch.no_grad(): 
+        for batch in val_loader:
+            input_data, label_data = batch
+
+            # Move both images and labels to GPU, if available
+            input_data = input_data.to(device)
+            label_data = label_data.to(device)
+
+            pred = model(input_data)
+            loss += loss_fn(pred, label_data).mean().item()
+
+            # Update both correct and count (use metrics for tensorboard)
+            correct += (torch.argmax(pred, dim=1) == label_data).sum().item()
+            count += len(label_data)
+
+    return loss, correct/count
