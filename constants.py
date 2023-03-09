@@ -1,16 +1,17 @@
 DATASET_PATH = "../../project/"
 
-N_EVAL = 100
-MODEL_IN_USE = "RNN"
+CURR_MODEL = "RNN"
 
-RNN_params = {
-    "EPOCHS" : 100, 
-    "BATCH_SIZE": 32, 
-    "N_EVAL": 100 
-}
-
-TRN_params = {
-    "EPOCHS" : 100, 
-    "BATCH_SIZE" : 32, 
-    "N_EVAL" : 100,
+params = {
+    "RNN" : {
+        "EPOCHS" : 100, 
+        "BATCH_SIZE": 32, 
+        "N_EVAL": 10 
+    }, 
+    "TRN": {
+        "EPOCHS" : 100, 
+        "BATCH_SIZE" : 32, 
+        "N_EVAL" : 10,
+        "NUM_HEADS" : 16,
+    }
 }
