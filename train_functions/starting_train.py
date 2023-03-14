@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
+from sklearn.metrics import accuracy_score 
+from torch.utils import tensorboard
+
+import constants 
 
 global device 
 device = torch.device('cpu') 
@@ -10,7 +14,7 @@ if torch.cuda.is_available():
     device = torch.device('cuda:0')
 
 
-def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
+def starting_train(train_dataset, val_dataset, model, hyperparameters):
     """
     Trains and evaluates a model.
 
@@ -19,11 +23,10 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
         val_dataset:     PyTorch dataset containing validation data.
         model:           PyTorch model to be trained.
         hyperparameters: Dictionary containing hyperparameters.
-        n_eval:          Interval at which we evaluate our model.
     """
 
     # Get keyword arguments
-    batch_size, epochs = hyperparameters["batch_size"], hyperparameters["epochs"]
+    batch_size, epochs, n_eval = hyperparameters["batch_size"], hyperparameters["epochs"], hyperparameters["n_eval"]
 
     # Initialize dataloaders
     train_loader = torch.utils.data.DataLoader(
@@ -34,17 +37,16 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
     )
 
     # Initalize optimizer (for gradient descent) and loss function
-    optimizer = optim.Adam(model.parameters())
+    optimizer = optim.Adam(model.parameters(), lr=1e-4, weight_decay=1e-4)
     loss_fn = nn.CrossEntropyLoss()
-
 
     model = model.to(device)
 
     # Initialize summary writer (for logging)
-    # summary_path = "" # <-- todo! add this in CONSTANTS.py for tensorboard gen 
-    # tb_summary = None
-    # if summary_path is not None:
-    #     tb_summary = torch.utils.tensorboard.SummaryWriter(summary_path)
+    summary_path = constants.SUMMARY_PATH
+    tb_summary = None
+    if summary_path is not None:
+        tb_summary = tensorboard.SummaryWriter(summary_path)
 
 
     step = 0
@@ -60,7 +62,6 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
             
             pred = model(input_data)
 
-            # Prediction, label data have same shape
             loss = loss_fn(pred, label_data) 
             pred = pred.argmax(axis=1)
 
@@ -70,53 +71,34 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
 
             print(f"\n    Train Loss: {loss.item()}")
 
+        # Periodically evaluate our model + log to Tensorboard
+        if epoch % n_eval == 0:
 
+            # Compute training loss and accuracy.
+            train_accuracy = accuracy_score(label_data, pred)
+            print(f"    Train Accu: {train_accuracy}")
 
-            # Periodically evaluate our model + log to Tensorboard
-            if step % n_eval == 0:
+            # Compute validation loss and accuracy.
+            valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
 
-                # Compute training loss and accuracy.
-                train_accuracy = compute_accuracy(pred, label_data)
-                print(f"    Train Accu: {train_accuracy}")
+            # # Log the results to Tensorboard
+            if tb_summary:
+                tb_summary.add_scalar('Loss (Training)', loss, epoch)
+                tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
+                tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
+                tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
 
-                # # Log the results to Tensorboard
-                # if tb_summary:
-                #     tb_summary.add_scalar('Loss (Training)', loss, epoch)
-                #     tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
+            print(f"    Valid Loss: {valid_loss}")
+            print(f"    Valid Accu: {valid_accuracy}")
 
-                # Compute validation loss and accuracy.
-                valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
-
-                # # Log the results to Tensorboard.
-                # if tb_summary:
-                #     tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
-                #     tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
-
-                print(f"    Valid Loss: {valid_loss}")
-                print(f"    Valid Accu: {valid_accuracy}")
-
-                model.train()
+            model.train()
 
             step += 1
 
         print()
 
 
-def compute_accuracy(outputs, labels):
-    """
-    Computes the accuracy of a model's predictions.
-
-    Example input:
-        outputs: [0.7, 0.9, 0.3, 0.2]
-        labels:  [1, 1, 0, 1]
-
-    Example output:
-        0.75
-    """
-    n_correct = (outputs == labels).sum().item()
-    n_total = len(outputs)
-    return n_correct / n_total
-
+ 
 
 def evaluate(val_loader, model, loss_fn):
     """
