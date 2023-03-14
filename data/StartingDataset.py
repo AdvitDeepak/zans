@@ -5,7 +5,16 @@ from constants import DATASET_PATH
 
 
 class StartingDataset(torch.utils.data.Dataset):
-    def __init__(self, split):
+    def __init__(
+        self,
+        split,
+        trim_end=1000,
+        maxpool_subsample=1,
+        average_aug_subsample=0,
+        average_aug_noise=0,
+        subsample_aug_size=1,
+        subsample_aug_noise=0
+    ):
         if split == "train":
             self.X = np.load(DATASET_PATH + "X_train_valid.npy") # (2115, 22, 1000)
             labels = np.load(DATASET_PATH + "y_train_valid.npy") - 769 # (2115,)
@@ -20,11 +29,54 @@ class StartingDataset(torch.utils.data.Dataset):
             self.person = np.load(DATASET_PATH + "person_test.npy") # (443, 1)
         else:
             raise Exception("Invalid split name")
+        
+        # Trimming the data (sample,22,1000) -> (sample,22,500)
+        if trim_end in range(0, self.X.shape[2] + 1):
+            self.X = self.X[:,:,0:trim_end]
+        
+        # Maxpooling the data (sample,22,1000) -> (sample,22,500/sub_sample)
+        self.X = np.max(
+            self.X.reshape(self.X.shape[0], self.X.shape[1], -1, maxpool_subsample),
+            axis=3
+        )
+        
+        total_X = self.X
+
+        # Averaging + noise
+        if average_aug_subsample > 0:
+            X_average = np.mean(
+                self.X.reshape(self.X.shape[0], self.X.shape[1], -1, average_aug_subsample),
+                axis=3
+            )
+            X_average = X_average + np.random.normal(0.0, average_aug_noise, X_average.shape)
+        
+            total_X = np.vstack((total_X, X_average))
+            self.y = np.hstack((self.y, self.y))
+        
+        # Subsampling
+        for i in range(subsample_aug_size):
+            X_subsample = self.X[:, i::subsample_aug_size] + \
+                np.random.normal(0.0, subsample_aug_noise, self.X[:,i::subsample_aug_size].shape)
+            total_X = np.vstack((total_X, X_subsample))
+            self.y = np.hstack((self.y, self.y))
+        
+        self.X = total_X
+        
         self.length = self.X.shape[0]
+
+    def getParticipantData(self, participant):
+        num_participants = self.person.max()
+        if participant not in range(0, num_participants):
+            raise Exception("Invalid participant number: choose between 0 and {}".format(num_participants - 1))
+        participant_idxs = np.where(self.person == participant)
+        return self.X[participant_idxs], self.y[participant_idxs]
 
     def __getitem__(self, index):
         inputs = self.X[index]
         label = self.y[index]
+        if self.trim_end and self.trim_end in range(0, inputs.shape[1]):
+            inputs = inputs[:,0:self.trim_end]
+
         return inputs, label
 
     def __len__(self):
