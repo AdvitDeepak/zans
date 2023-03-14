@@ -6,7 +6,6 @@ from tqdm import tqdm
 global device 
 device = torch.device('cpu') 
 
-# Switch to Cuda (GPU), if available
 if torch.cuda.is_available():
     device = torch.device('cuda:0')
 
@@ -41,12 +40,11 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
 
     model = model.to(device)
 
-
     # Initialize summary writer (for logging)
-    summary_path = "" # <-- todo! add this in CONSTANTS.py for tensorboard gen 
-    tb_summary = None
-    if summary_path is not None:
-        tb_summary = torch.utils.tensorboard.SummaryWriter(summary_path)
+    # summary_path = "" # <-- todo! add this in CONSTANTS.py for tensorboard gen 
+    # tb_summary = None
+    # if summary_path is not None:
+    #     tb_summary = torch.utils.tensorboard.SummaryWriter(summary_path)
 
 
     step = 0
@@ -81,18 +79,18 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, n_eval):
                 train_accuracy = compute_accuracy(pred, label_data)
                 print(f"    Train Accu: {train_accuracy}")
 
-                # Log the results to Tensorboard
-                if tb_summary:
-                    tb_summary.add_scalar('Loss (Training)', loss, epoch)
-                    tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
+                # # Log the results to Tensorboard
+                # if tb_summary:
+                #     tb_summary.add_scalar('Loss (Training)', loss, epoch)
+                #     tb_summary.add_scalar('Accuracy (Training)', train_accuracy, epoch)
 
                 # Compute validation loss and accuracy.
                 valid_loss, valid_accuracy = evaluate(val_loader, model, loss_fn)
 
-                # Log the results to Tensorboard.
-                if tb_summary:
-                    tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
-                    tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
+                # # Log the results to Tensorboard.
+                # if tb_summary:
+                #     tb_summary.add_scalar('Loss (Validation)', valid_loss, epoch)
+                #     tb_summary.add_scalar('Accuracy (Validation)', valid_accuracy, epoch)
 
                 print(f"    Valid Loss: {valid_loss}")
                 print(f"    Valid Accu: {valid_accuracy}")
@@ -115,8 +113,7 @@ def compute_accuracy(outputs, labels):
     Example output:
         0.75
     """
-
-    n_correct = (torch.round(outputs) == labels).sum().item()
+    n_correct = (outputs == labels).sum().item()
     n_total = len(outputs)
     return n_correct / n_total
 
@@ -127,7 +124,6 @@ def evaluate(val_loader, model, loss_fn):
     """
     model.eval()
     model = model.to(device)
-    model.resnet = (model.resnet).to(device)
 
     loss, correct, count = 0, 0, 0
     with torch.no_grad(): 

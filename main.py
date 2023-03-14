@@ -2,28 +2,36 @@ import os
 
 import constants
 from data.StartingDataset import StartingDataset
-from networks.StartingNetwork import StartingNetwork
 from train_functions.starting_train import starting_train
+from importlib import import_module
 
 # TODO: make a conda env to run everything 
 
 def main():
     # Get command line arguments
-    hyperparameters = {"epochs": constants.EPOCHS, "batch_size": constants.BATCH_SIZE}
 
-    print("Epochs:", constants.EPOCHS)
-    print("Batch size:", constants.BATCH_SIZE)
+    args = constants.params[constants.CURR_MODEL] 
+    epochs, batch_size, n_eval = args['EPOCHS'], args['BATCH_SIZE'], args['N_EVAL']
+    
+    hyperparameters = {"epochs": epochs, "batch_size": batch_size}
 
-    # Initalize dataset and model. Then train the model!
-    train_dataset = StartingDataset()
-    val_dataset = StartingDataset()
-    model = StartingNetwork()
+    print(f"Epochs: {epochs}\n Batch size: {batch_size}")
+
+    # Initalize dataset 
+    train_dataset = StartingDataset("train")
+    val_dataset = StartingDataset("val")
+
+    # Initialize model 
+    network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)
+    model = network_class(batch_size)
+    model = model.float()
+
     starting_train(
         train_dataset=train_dataset,
         val_dataset=val_dataset,
         model=model,
         hyperparameters=hyperparameters,
-        n_eval=constants.N_EVAL,
+        n_eval=n_eval,
     )
 
 
