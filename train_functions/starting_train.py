@@ -60,7 +60,12 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters):
             input_data = input_data.to(device)
             label_data = label_data.to(device)
             
-            pred = model(input_data)
+            if hasattr(model, "generate_square_subsequent_mask") and callable(model.generate_square_subsequent_mask):
+                batch_size = input_data.shape[0]
+                src_mask = model.generate_square_subsequent_mask(22, batch_size)
+                pred = model(input_data, src_mask)
+            else:
+                pred = model(input_data)
 
             loss = loss_fn(pred, label_data) 
             pred = pred.argmax(axis=1)
