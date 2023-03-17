@@ -11,11 +11,9 @@ class StartingDataset(torch.utils.data.Dataset):
         train_val_split=0.2,
         trim_end=1000,
         use_trn = False,
-        maxpool_subsample=1,
-        average_aug_subsample=0,
-        average_aug_noise=0,
-        subsample_aug_size=1,
-        subsample_aug_noise=0
+        aug_subsample_size=2,
+        average_aug_noise=0.5,
+        subsample_aug_noise=0.5
     ):
         if split == "train":
             self.X = np.load(DATASET_PATH + "X_train_valid.npy") # (2115, 22, 1000)
@@ -68,35 +66,39 @@ class StartingDataset(torch.utils.data.Dataset):
         # Trimming the data (sample,22,1000) -> (sample,22,500)
         if trim_end in range(0, self.X.shape[2] + 1):
             self.X = self.X[:,:,0:trim_end]
-        
-        # Maxpooling the data (sample,22,1000) -> (sample,22,500/sub_sample)
-        X_max = np.max(
-            self.X.reshape(self.X.shape[0], self.X.shape[1], -1, maxpool_subsample),
-            axis=3
-        )
-        
-        total_X = X_max
 
-        # Averaging + noise
-        if average_aug_subsample > 1:
+        if aug_subsample_size > 1:
+            # Maxpooling the data (sample,22,1000) -> (sample,22,500/sub_sample)
+            X_max = np.max(
+                self.X.reshape(self.X.shape[0], self.X.shape[1], -1, aug_subsample_size),
+                axis=3
+            )
+            total_X = X_max
+        
+            # Averaging + noise
             X_average = np.mean(
-                self.X.reshape(self.X.shape[0], self.X.shape[1], -1, average_aug_subsample),
+                self.X.reshape(self.X.shape[0], self.X.shape[1], -1, aug_subsample_size),
                 axis=3
             )
             X_average = X_average + np.random.normal(0.0, average_aug_noise, X_average.shape)
-        
+
+            if total_X != None:
+                total_X = np.vstack((total_X, X_average))
+                self.y = np.hstack((self.y, self.y))
+            else:
+                total_X = X_max
             total_X = np.vstack((total_X, X_average))
             self.y = np.hstack((self.y, self.y))
         
-        # Subsampling
-        if subsample_aug_size > 1:
-            for i in range(subsample_aug_size):
-                X_subsample = self.X[:, :, i::subsample_aug_size] + \
-                    np.random.normal(0.0, subsample_aug_noise, self.X[:,:,i::subsample_aug_size].shape)
+            # Subsampling
+            for i in range(aug_subsample_size):
+                X_subsample = self.X[:, :, i::aug_subsample_size] + \
+                    np.random.normal(0.0, subsample_aug_noise, self.X[:,:,i::aug_subsample_size].shape)
                 total_X = np.vstack((total_X, X_subsample))
                 self.y = np.hstack((self.y, self.y))
         
-        self.X = total_X
+            self.X = total_X
+
         if use_trn:
                 tgts = np.roll(self.X, -1, axis=2)
                 self.X = np.stack((self.X, tgts), axis=1)
