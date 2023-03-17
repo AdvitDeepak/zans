@@ -1,8 +1,9 @@
 import torch
 import numpy as np
 
-DATASET_PATH = "project_data/"
+import constants 
 
+DATASET_PATH = constants.DATASET_PATH
 
 class StartingDataset(torch.utils.data.Dataset):
     def __init__(
@@ -82,11 +83,6 @@ class StartingDataset(torch.utils.data.Dataset):
             )
             X_average = X_average + np.random.normal(0.0, average_aug_noise, X_average.shape)
 
-            if total_X != None:
-                total_X = np.vstack((total_X, X_average))
-                self.y = np.hstack((self.y, self.y))
-            else:
-                total_X = X_max
             total_X = np.vstack((total_X, X_average))
             self.y = np.hstack((self.y, self.y))
         
