@@ -9,8 +9,8 @@ class StartingDataset(torch.utils.data.Dataset):
         self,
         split,
         train_val_split=0.2,
-        trim_end=1000,
         use_trn = False,
+        trim_end=500,
         aug_subsample_size=2,
         average_aug_noise=0.5,
         subsample_aug_noise=0.5

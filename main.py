@@ -19,20 +19,14 @@ def main():
     print(f"Epochs: {epochs}\n Batch size: {batch_size}")
 
     # Initalize dataset 
-    train_dataset = StartingDataset("train", trim_end=500,
-                                                maxpool_subsample=2,
-                                                average_aug_subsample=2,
-                                                average_aug_noise=0.5,
-                                                subsample_aug_size=2,
-                                                subsample_aug_noise=0.5, 
-                                                use_trn=use_trn)
-    val_dataset = StartingDataset("val", trim_end=500,
-                                                maxpool_subsample=2,
-                                                average_aug_subsample=2,
-                                                average_aug_noise=0.5,
-                                                subsample_aug_size=2,
-                                                subsample_aug_noise=0.5,
-                                                use_trn=use_trn)
+    train_dataset = StartingDataset("train", 
+                                    use_trn=use_trn,
+                                    trim_end=constants.DATA["TRIM_END"],
+                                    aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
+    val_dataset = StartingDataset("val",
+                                  use_trn=use_trn,
+                                  trim_end=constants.DATA["TRIM_END"],
+                                  aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
 
     # Initialize model 
     network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)

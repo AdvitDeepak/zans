@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+import constants
+
 class RNN(torch.nn.Module):
     def __init__(
         self,
@@ -8,7 +10,7 @@ class RNN(torch.nn.Module):
         n_layers=1,
     ):
         
-        input_size=250
+        input_size= constants.DATA["TRIM_END"] // constants.DATA["AUG_SUBSAMPLE_SIZE"] # 250
         hidden_size=128
         num_classes = 4
 

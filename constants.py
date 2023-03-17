@@ -3,6 +3,11 @@ SUMMARY_PATH = "summaries/"
 
 CURR_MODEL = "RNN"
 
+DATA = {
+    "TRIM_END" : 500, 
+    "AUG_SUBSAMPLE_SIZE": 2, 
+}
+
 params = {
     "RNN" : {
         "EPOCHS" : 100, 
