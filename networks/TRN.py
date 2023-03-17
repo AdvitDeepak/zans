@@ -7,17 +7,20 @@ class TRN(torch.nn.Module):
     Basic logistic regression on 224x224x3 images.
     """
 
-    def __init__(self):
+    def __init__(self, batch_size):
         super().__init__()
-        self.transformer = nn.Transformer(nhead=16, num_encoder_layers=12, num_decoder_layers=12, batch_first=True)
+        self.transformer = nn.Transformer(d_model=250, nhead=5, num_encoder_layers=12, num_decoder_layers=12, batch_first=True)
+        self.num_classes = 4
         self.flatten = nn.Flatten()
-        self.fc = nn.Linear(224 * 224 * 3, 1)
+        self.fc = nn.Linear(250 * 22, self.num_classes)
         self.sigmoid = nn.Sigmoid()
 
 
 #update the data loader stuff 
-    def forward(self, src, tgt):
-        x = self.transformer(src, tgt)  #fix this 
+    def forward(self, inp):
+        src = inp[:, 0, :, :].float()
+        tgt = inp[:, 1, :, :].float()
+        x = self.transformer(src, tgt) 
         x = self.flatten(x)
         x = self.fc(x)
         x = self.sigmoid(x)

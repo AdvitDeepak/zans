@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 
-DATASET_PATH = "../project_data/"
+DATASET_PATH = "project_data/"
 
 
 class StartingDataset(torch.utils.data.Dataset):
@@ -10,6 +10,7 @@ class StartingDataset(torch.utils.data.Dataset):
         split,
         train_val_split=0.2,
         trim_end=1000,
+        use_trn = False,
         maxpool_subsample=1,
         average_aug_subsample=0,
         average_aug_noise=0,
@@ -57,6 +58,9 @@ class StartingDataset(torch.utils.data.Dataset):
     
 
         if split == "test": 
+            if use_trn:
+                tgts = np.roll(self.X, -1, axis=2)
+                self.X = np.stack((self.X, tgts), axis=1)
             self.X = torch.from_numpy(self.X).double() 
             self.length = self.X.shape[0]
             return 
@@ -93,6 +97,9 @@ class StartingDataset(torch.utils.data.Dataset):
                 self.y = np.hstack((self.y, self.y))
         
         self.X = total_X
+        if use_trn:
+                tgts = np.roll(self.X, -1, axis=2)
+                self.X = np.stack((self.X, tgts), axis=1)
         self.X = torch.from_numpy(self.X).double() 
         self.length = self.X.shape[0]
 

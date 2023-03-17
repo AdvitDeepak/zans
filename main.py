@@ -12,6 +12,7 @@ def main():
 
     args = constants.params[constants.CURR_MODEL] 
     epochs, batch_size, n_eval = args['EPOCHS'], args['BATCH_SIZE'], args['N_EVAL']
+    use_trn = constants.CURR_MODEL == "TRN"
     
     hyperparameters = {"epochs": epochs, "batch_size": batch_size, "n_eval": n_eval}
 
@@ -23,13 +24,15 @@ def main():
                                                 average_aug_subsample=2,
                                                 average_aug_noise=0.5,
                                                 subsample_aug_size=2,
-                                                subsample_aug_noise=0.5)
+                                                subsample_aug_noise=0.5, 
+                                                use_trn=use_trn)
     val_dataset = StartingDataset("val", trim_end=500,
                                                 maxpool_subsample=2,
                                                 average_aug_subsample=2,
                                                 average_aug_noise=0.5,
                                                 subsample_aug_size=2,
-                                                subsample_aug_noise=0.5)
+                                                subsample_aug_noise=0.5,
+                                                use_trn=use_trn)
 
     # Initialize model 
     network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)
