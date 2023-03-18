@@ -10,12 +10,13 @@ class StartingDataset(torch.utils.data.Dataset):
         self,
         split,
         train_val_split=0.2,
-        use_trn = False,
+        model = "TRN",
         trim_end=500,
         aug_subsample_size=2,
         average_aug_noise=0.5,
         subsample_aug_noise=0.5
     ):
+        self.model = model
         if split == "train":
             self.X = np.load(DATASET_PATH + "X_train_valid.npy") # (2115, 22, 1000)
             self.X = self.X[int(train_val_split*len(self.X)):]
@@ -57,7 +58,7 @@ class StartingDataset(torch.utils.data.Dataset):
     
 
         if split == "test": 
-            if use_trn:
+            if model == "TRN":
                 tgts = np.roll(self.X, -1, axis=2)
                 self.X = np.stack((self.X, tgts), axis=1)
             self.X = torch.from_numpy(self.X).double() 
@@ -95,7 +96,7 @@ class StartingDataset(torch.utils.data.Dataset):
         
             self.X = total_X
 
-        if use_trn:
+        if self.model == "TRN":
                 tgts = np.roll(self.X, -1, axis=2)
                 self.X = np.stack((self.X, tgts), axis=1)
         self.X = torch.from_numpy(self.X).double() 
@@ -109,7 +110,9 @@ class StartingDataset(torch.utils.data.Dataset):
         return self.X[participant_idxs], self.y[participant_idxs]
 
     def __getitem__(self, index):
-        inputs = self.X[index] 
+        inputs = self.X[index]
+        if self.model == "CNN" or self.model == "CNNRNN":
+            inputs = inputs.reshape(22, 1, -1)
         label = self.y[index]
 
         return inputs, label

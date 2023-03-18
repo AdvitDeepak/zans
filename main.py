@@ -12,19 +12,21 @@ def main():
 
     args = constants.params[constants.CURR_MODEL] 
     epochs, batch_size, n_eval = args['EPOCHS'], args['BATCH_SIZE'], args['N_EVAL']
-    use_trn = constants.CURR_MODEL == "TRN"
+    # use_trn = constants.CURR_MODEL == "TRN"
     
     hyperparameters = {"epochs": epochs, "batch_size": batch_size, "n_eval": n_eval}
 
     print(f"Epochs: {epochs}\n Batch size: {batch_size}")
 
     # Initalize dataset 
-    train_dataset = StartingDataset("train", 
-                                    use_trn=use_trn,
+    train_dataset = StartingDataset("train",
+                                    train_val_split=375 / 2115,
+                                    model=constants.CURR_MODEL,
                                     trim_end=constants.DATA["TRIM_END"],
                                     aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
     val_dataset = StartingDataset("val",
-                                  use_trn=use_trn,
+                                  train_val_split=375 / 2115,
+                                  model=constants.CURR_MODEL,
                                   trim_end=constants.DATA["TRIM_END"],
                                   aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
 
