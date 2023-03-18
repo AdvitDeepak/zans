@@ -1,3 +1,4 @@
+import os
 import torch
 import numpy as np
 
@@ -17,41 +18,41 @@ class StartingDataset(torch.utils.data.Dataset):
         subsample_aug_noise=0.5
     ):
         if split == "train":
-            self.X = np.load(DATASET_PATH + "X_train_valid.npy") # (2115, 22, 1000)
+            self.X = np.load(os.path.join(DATASET_PATH, "X_train_valid.npy")) # (2115, 22, 1000)
             self.X = self.X[int(train_val_split*len(self.X)):]
             #self.X = self.X.astype(np.float128)
 
-            labels = np.load(DATASET_PATH + "y_train_valid.npy") - 769 # (2115,)
+            labels = np.load(os.path.join(DATASET_PATH, "y_train_valid.npy")) - 769 # (2115,)
             labels = labels[int(train_val_split*len(labels)):]
             self.y = labels.astype(np.int64) 
             
             # self.y = np.zeros((labels.size, labels.max() + 1))
             # self.y[np.arange(labels.size), labels] = 1 # (2115, 4); converted into one-hot
-            self.person = np.load(DATASET_PATH + "person_train_valid.npy") # (2115, 1)
+            self.person = np.load(os.path.join(DATASET_PATH, "person_train_valid.npy")) # (2115, 1)
 
 
         elif split == "val":
-            self.X = np.load(DATASET_PATH + "X_train_valid.npy") # (2115, 22, 1000)
+            self.X = np.load(os.path.join(DATASET_PATH, "X_train_valid.npy")) # (2115, 22, 1000)
             self.X = self.X[:int(train_val_split*len(self.X))]
 
 
-            labels = np.load(DATASET_PATH + "y_train_valid.npy") - 769 # (2115,)
+            labels = np.load(os.path.join(DATASET_PATH, "y_train_valid.npy")) - 769 # (2115,)
             labels = labels[:int(train_val_split*len(labels))]
             self.y = labels.astype(np.int64)
             
             # self.y = np.zeros((labels.size, labels.max() + 1))
             # self.y[np.arange(labels.size), labels] = 1 # (2115, 4); converted into one-hot
-            self.person = np.load(DATASET_PATH + "person_train_valid.npy") # (2115, 1)
+            self.person = np.load(os.path.join(DATASET_PATH, "person_train_valid.npy")) # (2115, 1)
 
 
         elif split == "test":
-            self.X = np.load(DATASET_PATH + "X_test.npy") # (443, 22, 1000)
+            self.X = np.load(os.path.join(DATASET_PATH, "X_test.npy")) # (443, 22, 1000)
 
 
-            labels = np.load(DATASET_PATH + "y_test.npy") - 769 # (443,)
+            labels = np.load(os.path.join(DATASET_PATH, "y_test.npy")) - 769 # (443,)
             self.y = np.zeros((labels.size, labels.max() + 1))
             self.y[np.arange(labels.size), labels] = 1 # (443, 4); converted into one-hot
-            self.person = np.load(DATASET_PATH + "person_test.npy") # (443, 1)
+            self.person = np.load(os.path.join(DATASET_PATH, "person_test.npy")) # (443, 1)
         else:
             raise Exception("Invalid split name")
     

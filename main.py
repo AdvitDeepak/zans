@@ -10,13 +10,13 @@ from importlib import import_module
 def main():
     # Get command line arguments
 
-    args = constants.params[constants.CURR_MODEL] 
-    epochs, batch_size, n_eval = args['EPOCHS'], args['BATCH_SIZE'], args['N_EVAL']
+    config = constants.params[constants.CURR_MODEL] 
+    epochs, batch_size, n_eval = config['EPOCHS'], config['BATCH_SIZE'], config['N_EVAL']
     use_trn = constants.CURR_MODEL == "TRN"
     
     hyperparameters = {"epochs": epochs, "batch_size": batch_size, "n_eval": n_eval}
 
-    print(f"Epochs: {epochs}\n Batch size: {batch_size}")
+    print(f"Epochs: {epochs}\nBatch size: {batch_size}")
 
     # Initalize dataset 
     train_dataset = StartingDataset("train", 
@@ -30,7 +30,7 @@ def main():
 
     # Initialize model 
     network_class = import_module("networks." + constants.CURR_MODEL).__getattribute__(constants.CURR_MODEL)
-    model = network_class(batch_size)
+    model = network_class(config)
     model = model.float()
 
     starting_train(
@@ -38,6 +38,7 @@ def main():
         val_dataset=val_dataset,
         model=model,
         hyperparameters=hyperparameters,
+        use_masking=use_trn,
     )
 
 

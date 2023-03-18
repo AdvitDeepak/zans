@@ -3,41 +3,39 @@ import torch.nn as nn
 
 import constants
 
-class RNN(torch.nn.Module):
-    def __init__(
-        self,
-        batch_size,
-        n_layers=1,
-    ):
-        
-        input_size= constants.DATA["TRIM_END"] // constants.DATA["AUG_SUBSAMPLE_SIZE"] # 250
-        hidden_size=128
-        num_classes = 4
 
+class RNN(torch.nn.Module):
+    def __init__(self, model_config):
         super(RNN, self).__init__()
-        self.n_layers = n_layers
-        self.hidden_size = hidden_size
-        self.batch_size = batch_size
-        
+        input_size = constants.DATA["TRIM_END"] // constants.DATA[
+            "AUG_SUBSAMPLE_SIZE"]  # 250
+        self.n_layers = model_config['N_LAYERS']
+        self.hidden_size = model_config['HIDDEN_SIZE']
+        self.batch_size = model_config['BATCH_SIZE']
+        self.rnn_dropout = model_config['RNN_DROPOUT']
+        self.fc_dropout = model_config['FC_DROPOUT']
+
         self.rnn = nn.GRU(
             input_size,
-            hidden_size,
-            num_layers=n_layers,
+            self.hidden_size,
+            num_layers=self.n_layers,
             batch_first=True,
-            dropout=0.4,
+            dropout=self.rnn_dropout,
         )
-        self.decoder = nn.Linear(hidden_size*22, num_classes)
-        self.dropout = nn.Dropout(0.25)
-        
+        self.decoder = nn.Linear(
+            self.hidden_size * constants.DATA["NUM_ELECTRODES"],
+            constants.DATA["NUM_CLASSES"])
+        self.dropout = nn.Dropout(self.fc_dropout)
+
     def init_hidden(self):
         return torch.randn(self.n_layers, self.batch_size, self.hidden_size)
-    
+
     def forward(self, inputs):
         # Avoid breaking if the last batch has a different size
         batch_size = inputs.size(0)
         if batch_size != self.batch_size:
             self.batch_size = batch_size
-        
+
         inputs = inputs.to(torch.float32)
         output, hidden = self.rnn(inputs, self.init_hidden())
         # 32, 22, 128 (BATCH_SIZE, NUM_NODES, HIDDEN_SIZE)
