@@ -6,7 +6,7 @@ import constants
 
 class TRN(torch.nn.Module):
     """
-    Basic logistic regression on 224x224x3 images.
+    Transformer Architecture
     """
     def __init__(self, model_config):
         super().__init__()
@@ -23,8 +23,6 @@ class TRN(torch.nn.Module):
         self.fc = nn.Linear(input_size * constants.DATA["NUM_ELECTRODES"],
                             constants.DATA["NUM_CLASSES"])
 
-
-#update the data loader stuff
 
     def forward(self, inp, src_mask=None):
         src = inp[:, 0, :, :].float()

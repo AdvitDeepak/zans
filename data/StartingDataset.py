@@ -11,12 +11,14 @@ class StartingDataset(torch.utils.data.Dataset):
         self,
         split,
         train_val_split=0.2,
-        use_trn = False,
+        create_tgts=False,
+        use_cnn=False,
         trim_end=500,
         aug_subsample_size=2,
         average_aug_noise=0.5,
         subsample_aug_noise=0.5
     ):
+        self.use_cnn = use_cnn
         if split == "train":
             self.X = np.load(os.path.join(DATASET_PATH, "X_train_valid.npy")) # (2115, 22, 1000)
             self.X = self.X[int(train_val_split*len(self.X)):]
@@ -58,7 +60,7 @@ class StartingDataset(torch.utils.data.Dataset):
     
 
         if split == "test": 
-            if use_trn:
+            if create_tgts:
                 tgts = np.roll(self.X, -1, axis=2)
                 self.X = np.stack((self.X, tgts), axis=1)
             self.X = torch.from_numpy(self.X).double() 
@@ -96,7 +98,7 @@ class StartingDataset(torch.utils.data.Dataset):
         
             self.X = total_X
 
-        if use_trn:
+        if create_tgts:
                 tgts = np.roll(self.X, -1, axis=2)
                 self.X = np.stack((self.X, tgts), axis=1)
         self.X = torch.from_numpy(self.X).double() 
@@ -112,6 +114,9 @@ class StartingDataset(torch.utils.data.Dataset):
     def __getitem__(self, index):
         inputs = self.X[index] 
         label = self.y[index]
+        # add extra dimension if using CNN as first layer
+        if self.use_cnn:
+            inputs = inputs.reshape(constants.DATA["NUM_ELECTRODES"], 1, -1)
 
         return inputs, label
 
