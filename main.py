@@ -12,6 +12,7 @@ def main():
         'BATCH_SIZE'], config['N_EVAL']
     need_tgts = config['NEEDS_TGTS']
     use_cnn = config['USE_CNN']
+    tr_person_idx, val_person_idx = config['TR_PERSON_IDX'], config['VAL_PERSON_IDX']
 
     hyperparameters = {
         "epochs": epochs,
@@ -26,15 +27,17 @@ def main():
         "train",
         create_tgts=need_tgts,
         use_cnn=use_cnn,
+        person_idx=tr_person_idx,
         trim_end=constants.DATA["TRIM_END"],
         aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
     val_dataset = StartingDataset(
         "val",
         create_tgts=need_tgts,
         use_cnn=use_cnn,
+        person_idx=val_person_idx,
         trim_end=constants.DATA["TRIM_END"],
         aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
-
+    
     # Initialize model
     network_class = import_module("networks." +
                                   constants.CURR_MODEL).__getattribute__(

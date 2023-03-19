@@ -27,6 +27,10 @@ Model parameters are set in the `params` dictionary. Each model's parameter dict
          "USE_CNN": True,
          # adds target data to inputs in case of transformer
          "NEEDS_TGTS": False,
+         # which participant to use for train data (None = all particpants)
+         "TR_PERSON_IDX": None,
+         # which participant to use for val data (None = all particpants)
+        "VAL_PERSON_IDX": None,
       }
 
 

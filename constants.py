@@ -17,6 +17,8 @@ params = {
         "N_EVAL": 1,
         "USE_CNN": True,
         "NEEDS_TGTS": False,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         "C_DROPOUT": 0.5,
         "HIDDEN_SIZE": 3200,
@@ -28,6 +30,8 @@ params = {
         "N_EVAL": 1, 
         "USE_CNN": True,
         "NEEDS_TGTS": False,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         # CNN
         "C_DROPOUT": 0.5,
@@ -46,6 +50,8 @@ params = {
         "N_EVAL": 1,
         "USE_CNN": False,
         "NEEDS_TGTS": False,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         "RNN_DROPOUT": 0.4,
         "FC_DROPOUT": 0.2,
@@ -58,6 +64,8 @@ params = {
         "N_EVAL" : 1,
         "USE_CNN": False,
         "NEEDS_TGTS": True,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         "N_HEADS" : 5,
         "N_LAYERS": 12,
@@ -68,6 +76,8 @@ params = {
         "N_EVAL" : 1,
         "USE_CNN": True,
         "NEEDS_TGTS": False,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         "OUT_CHANNELS": 25,
         "TRANSFORMER_LAYERS": 12,
@@ -85,6 +95,8 @@ params = {
         # input reshaping so set to False
         "USE_CNN": False,
         "NEEDS_TGTS": False,
+        "TR_PERSON_IDX": None,
+        "VAL_PERSON_IDX": None,
 
         "OUT_CHANNELS": 16,
         "TRANSFORMER_LAYERS": 12,
