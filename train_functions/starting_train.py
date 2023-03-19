@@ -75,7 +75,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters, use_maski
             optimizer.step()
             optimizer.zero_grad()
 
-            # print(f"\n    Train Loss: {loss.item()}")
+            print(f"\n    Train Loss: {loss.item()}")
 
         # Periodically evaluate our model + log to Tensorboard
         if epoch % n_eval == 0:

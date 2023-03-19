@@ -1,7 +1,7 @@
-DATASET_PATH = "../../project/"
+DATASET_PATH = "project/"
 SUMMARY_PATH = "summaries/"
 
-CURR_MODEL = "CNN"
+CURR_MODEL = "CNNRNN"
 
 DATA = {
     "TRIM_END" : 500, 
@@ -17,6 +17,10 @@ params = {
         "N_EVAL": 1,
         "USE_CNN": True,
         "NEEDS_TGTS": False,
+
+        "C_DROPOUT": 0.5,
+        "HIDDEN_SIZE": 3200,
+        "OUT_CHANNELS": [25, 50, 100, 200, 400],
     }, 
     "CNNRNN" : {
         "EPOCHS" : 100, 
@@ -24,6 +28,17 @@ params = {
         "N_EVAL": 1, 
         "USE_CNN": True,
         "NEEDS_TGTS": False,
+
+        # CNN
+        "C_DROPOUT": 0.5,
+        "HIDDEN_SIZE": 3200,
+        "OUT_CHANNELS": [25, 50, 100, 200],
+
+        # RNN
+        "N_LAYERS": 1,
+        "R_DROPOUT": 0.4,
+        "FC_DROPOUT": 0.25,
+        "HIDDEN_SIZE": 128,
     }, 
     "RNN" : {
         "EPOCHS" : 100, 
