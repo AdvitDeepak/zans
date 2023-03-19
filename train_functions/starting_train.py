@@ -14,7 +14,7 @@ if torch.cuda.is_available():
     device = torch.device('cuda:0')
 
 
-def starting_train(train_dataset, val_dataset, model, hyperparameters):
+def starting_train(train_dataset, val_dataset, model, hyperparameters, use_masking=False):
     """
     Trains and evaluates a model.
 
@@ -23,6 +23,7 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters):
         val_dataset:     PyTorch dataset containing validation data.
         model:           PyTorch model to be trained.
         hyperparameters: Dictionary containing hyperparameters.
+        use_masking: True if using TRN to mask src data
     """
 
     # Get keyword arguments
@@ -60,7 +61,12 @@ def starting_train(train_dataset, val_dataset, model, hyperparameters):
             input_data = input_data.to(device)
             label_data = label_data.to(device)
             
-            pred = model(input_data)
+            if use_masking:
+                batch_size = input_data.shape[0]
+                src_mask = model.generate_square_subsequent_mask(22, batch_size)
+                pred = model(input_data, src_mask)
+            else:
+                pred = model(input_data)
 
             loss = loss_fn(pred, label_data) 
             pred = pred.argmax(axis=1)
