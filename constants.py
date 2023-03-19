@@ -13,7 +13,7 @@ DATA = {
 params = {
     "CNN" : {
         "EPOCHS" : 100, 
-        "BATCH_SIZE": 128, 
+        "BATCH_SIZE": 512, 
         "N_EVAL": 1,
         "USE_CNN": True,
         "NEEDS_TGTS": False,
