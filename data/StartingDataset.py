@@ -16,7 +16,8 @@ class StartingDataset(torch.utils.data.Dataset):
         trim_end=500,
         aug_subsample_size=2,
         average_aug_noise=0.5,
-        subsample_aug_noise=0.5
+        subsample_aug_noise=0.5, 
+        person_idx=None,
     ):
         self.use_cnn = use_cnn
         if split == "train":
@@ -103,6 +104,10 @@ class StartingDataset(torch.utils.data.Dataset):
                 self.X = np.stack((self.X, tgts), axis=1)
         self.X = torch.from_numpy(self.X).double() 
         self.length = self.X.shape[0]
+        
+        if person_idx is not None: 
+            self.X, self.y = self.getParticipantData(person_idx)
+
 
     def getParticipantData(self, participant):
         num_participants = self.person.max()
