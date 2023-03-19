@@ -38,8 +38,8 @@ params = {
         "BATCH_SIZE" : 128, 
         "N_EVAL" : 1,
         "USE_CNN": True,
-
         "NEEDS_TGTS": False,
+
         "OUT_CHANNELS": 25,
         "TRANSFORMER_LAYERS": 12,
         "D_MODEL": 83,
@@ -48,4 +48,22 @@ params = {
         "C_DROPOUT": 0.5,
         "HIDDEN_SIZE": 2075,
     },
+    "CTN_ALT": {
+        "EPOCHS" : 100, 
+        "BATCH_SIZE" : 128, 
+        "N_EVAL" : 1,
+        # technically uses CNN but doesn't require
+        # input reshaping so set to False
+        "USE_CNN": False,
+        "NEEDS_TGTS": False,
+
+        "OUT_CHANNELS": 16,
+        "TRANSFORMER_LAYERS": 12,
+        "N_HEADS": 5,
+        "D_MODEL": 125,
+        "FC_DROPOUT": 0.4,
+        "HIDDEN_SIZE_1": 1375,
+        "HIDDEN_SIZE_2": 64,
+
+    }
 }

@@ -5,9 +5,7 @@ import constants
 
 
 class TRN(torch.nn.Module):
-    """
-    Transformer Architecture
-    """
+    """Transformer Architecture"""
     def __init__(self, model_config):
         super().__init__()
         input_size = constants.DATA["TRIM_END"] // constants.DATA[
@@ -22,7 +20,6 @@ class TRN(torch.nn.Module):
         self.flatten = nn.Flatten()
         self.fc = nn.Linear(input_size * constants.DATA["NUM_ELECTRODES"],
                             constants.DATA["NUM_CLASSES"])
-
 
     def forward(self, inp, src_mask=None):
         src = inp[:, 0, :, :].float()
