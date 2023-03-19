@@ -112,7 +112,7 @@ class StartingDataset(torch.utils.data.Dataset):
         return self.X[participant_idxs], self.y[participant_idxs]
 
     def __getitem__(self, index):
-        inputs = self.X[index] 
+        inputs = self.X[index]
         label = self.y[index]
         # add extra dimension if using CNN as first layer
         if self.use_cnn:
