@@ -32,6 +32,8 @@ class StartingDataset(torch.utils.data.Dataset):
             # self.y = np.zeros((labels.size, labels.max() + 1))
             # self.y[np.arange(labels.size), labels] = 1 # (2115, 4); converted into one-hot
             self.person = np.load(os.path.join(DATASET_PATH, "person_train_valid.npy")) # (2115, 1)
+            self.num_participants = self.person.max()
+            self.person = self.person[int(train_val_split*len(self.person)):]
 
 
         elif split == "val":
@@ -46,6 +48,8 @@ class StartingDataset(torch.utils.data.Dataset):
             # self.y = np.zeros((labels.size, labels.max() + 1))
             # self.y[np.arange(labels.size), labels] = 1 # (2115, 4); converted into one-hot
             self.person = np.load(os.path.join(DATASET_PATH, "person_train_valid.npy")) # (2115, 1)
+            self.num_participants = self.person.max()
+            self.person = self.person[:int(train_val_split*len(self.person))]
 
 
         elif split == "test":
@@ -56,6 +60,7 @@ class StartingDataset(torch.utils.data.Dataset):
             self.y = np.zeros((labels.size, labels.max() + 1))
             self.y[np.arange(labels.size), labels] = 1 # (443, 4); converted into one-hot
             self.person = np.load(os.path.join(DATASET_PATH, "person_test.npy")) # (443, 1)
+            self.num_participants = self.person.max()
         else:
             raise Exception("Invalid split name")
     
@@ -89,6 +94,7 @@ class StartingDataset(torch.utils.data.Dataset):
 
             total_X = np.vstack((total_X, X_average))
             self.y = np.hstack((self.y, self.y))
+            self.person = np.hstack((self.person, self.person))
         
             # Subsampling
             for i in range(aug_subsample_size):
@@ -96,6 +102,7 @@ class StartingDataset(torch.utils.data.Dataset):
                     np.random.normal(0.0, subsample_aug_noise, self.X[:,:,i::aug_subsample_size].shape)
                 total_X = np.vstack((total_X, X_subsample))
                 self.y = np.hstack((self.y, self.y))
+                self.person = np.hstack((self.person, self.person))
         
             self.X = total_X
 
@@ -110,9 +117,8 @@ class StartingDataset(torch.utils.data.Dataset):
 
 
     def getParticipantData(self, participant):
-        num_participants = self.person.max()
-        if participant not in range(0, num_participants):
-            raise Exception("Invalid participant number: choose between 0 and {}".format(num_participants - 1))
+        if participant not in range(0, self.num_participants):
+            raise Exception("Invalid participant number: choose between 0 and {}".format(self.num_participants - 1))
         participant_idxs = np.where(self.person == participant)
         return self.X[participant_idxs], self.y[participant_idxs]
 
