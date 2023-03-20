@@ -120,7 +120,6 @@ class StartingDataset(torch.utils.data.Dataset):
         if participant not in range(0, self.num_participants):
             raise Exception("Invalid participant number: choose between 0 and {}".format(self.num_participants - 1))
         participant_idxs = np.asarray(self.person == participant).nonzero()[0]
-        print(self.X.shape, participant_idxs.shape)
 
         return self.X[participant_idxs], self.y[participant_idxs]
 

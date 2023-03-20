@@ -1,7 +1,7 @@
 DATASET_PATH = "project/"
 SUMMARY_PATH = "summaries/"
 
-CURR_MODEL = "CNNRNN"
+CURR_MODEL = "CNN"
 
 DATA = {
     "TRIM_END" : 500, 
@@ -19,10 +19,12 @@ params = {
         "NEEDS_TGTS": False,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
-        "C_DROPOUT": 0.5,
-        "HIDDEN_SIZE": 3200,
-        "OUT_CHANNELS": [25, 50, 100, 200, 400],
+        "C_DROPOUT": [0.55, 0.65, 0.75],
+        "OUT_CHANNELS": [32, 64, 128],
+        "F_DROPOUT": 0.5,
+        "HIDDEN_SIZES": [4096, 512, 64],
     }, 
     "CNNRNN" : {
         "EPOCHS" : 100, 
@@ -32,6 +34,7 @@ params = {
         "NEEDS_TGTS": False,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
         # CNN
         "C_DROPOUT": 0.5,
@@ -52,6 +55,7 @@ params = {
         "NEEDS_TGTS": False,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
         "RNN_DROPOUT": 0.4,
         "FC_DROPOUT": 0.2,
@@ -66,6 +70,7 @@ params = {
         "NEEDS_TGTS": True,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
         "N_HEADS" : 5,
         "N_LAYERS": 12,
@@ -78,6 +83,7 @@ params = {
         "NEEDS_TGTS": False,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
         "OUT_CHANNELS": 25,
         "TRANSFORMER_LAYERS": 12,
@@ -97,6 +103,7 @@ params = {
         "NEEDS_TGTS": False,
         "TR_PERSON_IDX": None,
         "VAL_PERSON_IDX": None,
+        "TRAIN_VAL_SPLIT": 0.1,
 
         "OUT_CHANNELS": 16,
         "TRANSFORMER_LAYERS": 12,

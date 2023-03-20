@@ -13,6 +13,7 @@ def main():
     need_tgts = config['NEEDS_TGTS']
     use_cnn = config['USE_CNN']
     tr_person_idx, val_person_idx = config['TR_PERSON_IDX'], config['VAL_PERSON_IDX']
+    train_val_split = config['TRAIN_VAL_SPLIT']
 
     hyperparameters = {
         "epochs": epochs,
@@ -25,6 +26,7 @@ def main():
     # Initalize dataset
     train_dataset = StartingDataset(
         "train",
+        train_val_split=train_val_split,
         create_tgts=need_tgts,
         use_cnn=use_cnn,
         person_idx=tr_person_idx,
@@ -32,6 +34,7 @@ def main():
         aug_subsample_size=constants.DATA["AUG_SUBSAMPLE_SIZE"])
     val_dataset = StartingDataset(
         "val",
+        train_val_split=train_val_split,
         create_tgts=need_tgts,
         use_cnn=use_cnn,
         person_idx=val_person_idx,
