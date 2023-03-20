@@ -1,4 +1,4 @@
-# ZANS - tbd acronym
+# ZANS 😁
 
 ## Setup
 
